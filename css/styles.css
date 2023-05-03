@@ -1,0 +1,78 @@
+/*
+Colors
+--silver: #cececeff;
+--battleship-gray: #828c8eff;
+--outer-space: #36494eff;
+--dark-purple: #130d2eff;
+--apricot: #ffd3b5ff;
+--old-rose: #d08c87ff;
+--old-rose-2: #c47a7cff;
+--indian-red: #b86870ff;
+--amaranth-purple: #a04458ff;
+*/
+body {
+  margin: 0;
+}
+
+header {
+    background: #a04458;
+    padding: 20px 40px;
+    position: relative;
+  }
+  
+  nav {
+    overflow: hidden;
+    position: relative;
+  }
+  
+  ul {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    right: 0;
+  }
+  
+  li {
+    flex-shrink: 0;
+    width: 150px;
+    list-style: none;
+    text-align: center;
+  }
+
+  li:first-child a, li:last-child a {
+    background: #36494eff;
+    color: white;
+  }
+  
+  a {
+    display: block;
+    padding: 20px;
+    text-decoration: none;
+    background: #828c8e;
+    color: #36494e;
+    border: 1px solid #597081;
+  }
+  
+  .nav-arrow {
+    width: 40px;
+    height: 40px;
+    background: #c47a7c;
+    border-radius: 50%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    /* display: none; */
+  }
+  
+  .nav-arrow:first-child {
+    top: 30px;
+    left: 20px;
+    z-index: 999;
+  }
+  
+  .nav-arrow:last-child {
+    top: 30px;
+    right: 20px;
+    z-index: 999;
+  }
