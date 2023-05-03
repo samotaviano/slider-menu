@@ -22,22 +22,23 @@ let navWidth = window.getComputedStyle(nav).width;
 // and the direction to move
 let onPress = false;
 let distance = 0;
-const step = 2;
+const step = 10;
 let direction;
+let timer;
 
 function logFollowUp () {
-  console.log(`
-  ##################################
+  // console.log(`
+  // ##################################
 
-  Nav width: ${navWidth}
-  Menu Total Width: ${menuItemsTotalWidth}
-  Menu left: ${menuItemsxPos}
-  Moved: ${menuPos}
-  Distance: ${distance}
-  Menu right: ${menuItems.style.right}
+  // Nav width: ${navWidth}
+  // Menu Total Width: ${menuItemsTotalWidth}
+  // Menu left: ${menuItemsxPos}
+  // Moved: ${menuPos}
+  // Distance: ${distance}
+  // Menu right: ${menuItems.style.right}
 
-  ##################################
-  `);
+  // ##################################
+  // `);
 }
 
 setArrows();
@@ -63,22 +64,32 @@ window.addEventListener('resize', function(event) {
   logFollowUp();
 }, true);
 
+let counter= 0;
 
 
 // Add mousedown event
 arrowsContainer.addEventListener("mousedown",(evt) => {
   onPress = true;
   direction = evt.target.getAttribute("data-dir");
-  setInterval(function() {
-    move(direction);
-  }, 1);
+  
+  if (!timer) {
+    timer = setInterval(function() {
+      move(direction);
+      counter += 1;
+      
+      console.log(`Counter is: ${counter}`);
+    }, 20);
+  }
+  
 
 });
 
 // Add mouseup event
 arrowsContainer.addEventListener("mouseup", () => {
   onPress = false;
-  distance = 0;
+  clearInterval(timer);
+  // release our intervalID from the variable
+  timer = null;
   console.log(`Released and distance = ${distance}`);
 });
 
