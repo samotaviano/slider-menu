@@ -1,5 +1,7 @@
 // The header wich has the arrows, and the arrows
 const arrowsContainer = document.querySelector("header");
+const arrowsContainerPadding = window.getComputedStyle(arrowsContainer).paddingLeft.slice(0,-2);
+console.log(arrowsContainerPadding);
 const leftArrow = document.querySelector(".nav-arrow:first-child");
 const rightArrow = document.querySelector(".nav-arrow:last-child");
 
@@ -10,12 +12,11 @@ const nav = document.querySelector("nav");
 // The ul that contains the menu items
 const menuItems = document.querySelector("ul");
 const menuItemsWidth = window.getComputedStyle(menuItems.querySelector("li")).width.slice(0,-2);
-console.log(menuItemsWidth);
 
 
 let menuItemsTotalWidth = menuItems.querySelectorAll("li").length * menuItemsWidth;
 let menuItemsxPos = menuItems.getBoundingClientRect().left;
-let navWidth = window.getComputedStyle(nav).width;
+let navWidth = window.getComputedStyle(nav).width.slice(0,-2);
 
 // Create variables to detect if the button is pressed,
 // the distance to move horizontally
@@ -27,18 +28,18 @@ let direction;
 let timer;
 
 function logFollowUp () {
-  // console.log(`
-  // ##################################
+  console.log(`
+  ##################################
 
-  // Nav width: ${navWidth}
-  // Menu Total Width: ${menuItemsTotalWidth}
-  // Menu left: ${menuItemsxPos}
-  // Moved: ${menuPos}
-  // Distance: ${distance}
-  // Menu right: ${menuItems.style.right}
+  Nav width: ${navWidth}
+  Menu Total Width (menuItemsTotalWidth): ${menuItemsTotalWidth}
+  Menu left (menuItemsxPos): ${menuItemsxPos}
+  Moved: ${menuPos}
+  Distance: ${distance}
+  Menu right menuItems.style.right: ${menuItems.style.right}
 
-  // ##################################
-  // `);
+  ##################################
+  `);
 }
 
 setArrows();
@@ -46,10 +47,24 @@ setArrows();
 function setArrows () {
   navWidth = window.getComputedStyle(nav).width.slice(0,-2);
   menuItemsxPos = menuItems.getBoundingClientRect().left;
-  console.log(menuItemsxPos === 40 && menuItemsTotalWidth > navWidth);
-  if (menuItemsxPos === 40 && menuItemsTotalWidth > navWidth) {
+  rigthLimit = calcRigthLimit(menuItemsxPos, navWidth, arrowsContainerPadding);
+  console.log(rigthLimit);
+  if (rigthLimit >= 1190) {
+    rightArrow.style.display = "none";
+    leftArrow.style.display = "block";
+  } else if (menuItemsxPos === 40 && menuItemsTotalWidth > navWidth) {
     rightArrow.style.display = "block";
+    leftArrow.style.display = "none";
+  } else if (menuItemsxPos < 40 && menuItemsTotalWidth > navWidth) {
+    rightArrow.style.display = "block";
+    leftArrow.style.display = "block";
   }
+}
+
+// Calculate the rigth limit: sum of menu left, nav width and header padding
+// 
+function calcRigthLimit (menuLeft, navWidth, headerPadding) {
+  return Math.abs(menuLeft) + Number(navWidth) + Number(headerPadding);
 }
 
 
@@ -75,12 +90,11 @@ arrowsContainer.addEventListener("mousedown",(evt) => {
   if (!timer) {
     timer = setInterval(function() {
       move(direction);
-      counter += 1;
-      
+      // counter += 1;
+      setArrows();
       console.log(`Counter is: ${counter}`);
-    }, 20);
+    }, 5);
   }
-  
 
 });
 
@@ -98,16 +112,18 @@ function move (arrowDir) {
     
   if (onPress === true) {
     // && menuPos < 0
-    if (arrowDir === "left") {
-      console.log(`Pressed the left arrow and distance = ${distance}`);
+    if (arrowDir === "left" && menuItemsxPos <= 30 ) {
+      // console.log(`Pressed the left arrow and distance = ${distance}`);
+      
         distance = distance - step;
         menuItems.style.right = distance + "px";
         menuPos = window.getComputedStyle(menuItems).right.slice(0,-2);
         menuItemsxPos = menuItems.getBoundingClientRect().left;
         logFollowUp();
         // console.log(`Moved ${distance} to the ${arrowDir} and is positioned ${menuItems.style.right}`);
-    } else if (arrowDir === "right") {
-      console.log(`Pressed the right arrow and distance = ${distance}`);
+    } else if (arrowDir === "right" && calcRigthLimit(menuItemsxPos, navWidth, arrowsContainerPadding) < 1200) {
+      // console.log(`Pressed the right arrow and distance = ${distance}`);
+      console.log(calcRigthLimit(menuItemsxPos, navWidth, arrowsContainerPadding));
         distance = distance + step;
         menuItems.style.right = distance + "px";
         menuPos = window.getComputedStyle(menuItems).right.slice(0,-2);

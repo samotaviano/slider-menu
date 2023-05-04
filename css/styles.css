@@ -17,6 +17,7 @@ body {
 header {
     background: #a04458;
     padding: 20px 40px;
+    margin: 0 auto;
     position: relative;
   }
   
@@ -27,10 +28,10 @@ header {
   
   ul {
     display: flex;
+    justify-content: center;
     padding: 0;
     margin: 0;
     position: relative;
-    right: 0;
   }
   
   li {
@@ -62,7 +63,7 @@ header {
     position: absolute;
     display: flex;
     align-items: center;
-    /* display: none; */
+    display: none;
   }
   
   .nav-arrow:first-child {
