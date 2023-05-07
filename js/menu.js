@@ -1,23 +1,39 @@
-// The header wich has the arrows, and the arrows
+// Variables to store the header (container) and the arrows
 const arrowsContainer = document.querySelector("header");
-const arrowsContainerPadding = window.getComputedStyle(arrowsContainer).paddingLeft.slice(0,-2);
-console.log(arrowsContainerPadding);
 const leftArrow = document.querySelector(".nav-arrow:first-child");
 const rightArrow = document.querySelector(".nav-arrow:last-child");
 
 
-// The nav element
-const nav = document.querySelector("nav");
+// The ul that contains the menu items is called menuContainer
+const menuContainer = document.querySelector("ul");
+let menuContainerWidth = window.getComputedStyle(menuContainer).width.slice(0,-2);
 
-// The ul that contains the menu items
-const menuItems = document.querySelector("ul");
-const menuItemsWidth = window.getComputedStyle(menuItems.querySelector("li")).width.slice(0,-2);
+// Measurements to control the menu functionality
+
+// Header left padding (the left limit for the menu)
+const arrowsContainerPadding = window.getComputedStyle(arrowsContainer).paddingLeft.slice(0,-2);
+
+// Total width of menu items (all the li)
+const singleMenuItem = menuContainer.querySelector("li");
+const menuItemWidth = window.getComputedStyle(singleMenuItem).width.slice(0,-2);
+let menuItemsTotalWidth = menuContainer.querySelectorAll("li").length * menuItemWidth;
+
+// The first and the last menu items
+const firstMenuItem = menuContainer.querySelector("li:first-child");
+let firstMenuItemXPos = firstMenuItem.getBoundingClientRect().left;
+
+const lastMenuItem = menuContainer.querySelector("li:last-child");
+let lastMenuItemXPos = lastMenuItem.getBoundingClientRect().left;
+
+function checkSizesPos() {
+  menuContainerWidth = window.getComputedStyle(menuContainer).width.slice(0,-2);
+  firstMenuItemXPos = firstMenuItem.getBoundingClientRect().left;
+  lastMenuItemXPos = lastMenuItem.getBoundingClientRect().left;
+  setArrows();
+}
 
 
-let menuItemsTotalWidth = menuItems.querySelectorAll("li").length * menuItemsWidth;
-let menuItemsxPos = menuItems.getBoundingClientRect().left;
-let navWidth = window.getComputedStyle(nav).width.slice(0,-2);
-
+// Variabes to trigger or to stop the menu functionality
 // Create variables to detect if the button is pressed,
 // the distance to move horizontally
 // and the direction to move
@@ -30,46 +46,54 @@ let timer;
 function logFollowUp () {
   console.log(`
   ##################################
-
-  Nav width: ${navWidth}
-  Menu Total Width (menuItemsTotalWidth): ${menuItemsTotalWidth}
-  Menu left (menuItemsxPos): ${menuItemsxPos}
-  Moved: ${menuPos}
-  Distance: ${distance}
-  Menu right menuItems.style.right: ${menuItems.style.right}
-
+  Largura ul [menuContainerWidth]: ${menuContainerWidth}
+  Largura de cada item de menu [menuItemWidth]: ${menuItemWidth}
+  Largura total de todos os items de menu [menuItemsTotalWidth]: ${menuItemsTotalWidth}
+  1º item de menu posição X (left) [firstMenuItemXPos]: ${firstMenuItemXPos}
+  Último item de menu posição X (left) [lastMenuItemXPos]: ${lastMenuItemXPos}
   ##################################
   `);
 }
 
+
+// Function to display or hidde the arros
+// According to certain conditions
 setArrows();
 
 function setArrows () {
-  navWidth = window.getComputedStyle(nav).width.slice(0,-2);
-  menuItemsxPos = menuItems.getBoundingClientRect().left;
-  rigthLimit = calcRigthLimit(menuItemsxPos, navWidth, arrowsContainerPadding);
-  console.log(rigthLimit);
-  if (rigthLimit >= 1190) {
+  // navWidth = window.getComputedStyle(nav).width.slice(0,-2);
+  menuContainerWidth = window.getComputedStyle(menuContainer).width.slice(0,-2);
+  if (menuItemsTotalWidth < menuContainerWidth) {
     rightArrow.style.display = "none";
-    leftArrow.style.display = "block";
-  } else if (menuItemsxPos === 40 && menuItemsTotalWidth > navWidth) {
-    rightArrow.style.display = "block";
     leftArrow.style.display = "none";
-  } else if (menuItemsxPos < 40 && menuItemsTotalWidth > navWidth) {
+  } else {
     rightArrow.style.display = "block";
     leftArrow.style.display = "block";
   }
+  // menuItemsxPos = menuItems.getBoundingClientRect().left;
+  // rigthLimit = calcRigthLimit(menuItemsxPos, navWidth, arrowsContainerPadding);
+  // console.log(rigthLimit);
+  // if (rigthLimit >= 1190) {
+  //   rightArrow.style.display = "none";
+  //   leftArrow.style.display = "block";
+  // } else if (menuItemsxPos === 40 && menuItemsTotalWidth > navWidth) {
+  //   rightArrow.style.display = "block";
+  //   leftArrow.style.display = "none";
+  // } else if (menuItemsxPos < 40 && menuItemsTotalWidth > navWidth) {
+  //   rightArrow.style.display = "block";
+  //   leftArrow.style.display = "block";
+  // }
 }
 
 // Calculate the rigth limit: sum of menu left, nav width and header padding
 // 
-function calcRigthLimit (menuLeft, navWidth, headerPadding) {
-  return Math.abs(menuLeft) + Number(navWidth) + Number(headerPadding);
+function calcRigthLimit (menuLeft, liGroupWidth, headerPadding) {
+  return Math.abs(menuLeft) + Number(liGroupWidth) + Number(headerPadding);
 }
 
 
 // Get the x position of the menu (the ul element)
-let menuPos = window.getComputedStyle(menuItems).right.slice(0,-2);
+let liGroupRight = window.getComputedStyle(menuContainer).right.slice(0,-2);
 logFollowUp();
 
 // If the window is resized gets the width of the nav element
@@ -79,8 +103,6 @@ window.addEventListener('resize', function(event) {
   logFollowUp();
 }, true);
 
-let counter= 0;
-
 
 // Add mousedown event
 arrowsContainer.addEventListener("mousedown",(evt) => {
@@ -89,11 +111,10 @@ arrowsContainer.addEventListener("mousedown",(evt) => {
   
   if (!timer) {
     timer = setInterval(function() {
-      move(direction);
-      // counter += 1;
+      moveDirection(direction);
+      checkSizesPos()
       setArrows();
-      console.log(`Counter is: ${counter}`);
-    }, 5);
+    }, 1);
   }
 
 });
@@ -102,35 +123,36 @@ arrowsContainer.addEventListener("mousedown",(evt) => {
 arrowsContainer.addEventListener("mouseup", () => {
   onPress = false;
   clearInterval(timer);
-  // release our intervalID from the variable
+  // Sets back the timer variable to null
   timer = null;
-  console.log(`Released and distance = ${distance}`);
 });
 
-// Function to activate the movement
-function move (arrowDir) {
+// Function detect moving direction and activate the movement
+function moveDirection (arrowDir) {
     
   if (onPress === true) {
-    // && menuPos < 0
-    if (arrowDir === "left" && menuItemsxPos <= 30 ) {
-      // console.log(`Pressed the left arrow and distance = ${distance}`);
-      
-        distance = distance - step;
-        menuItems.style.right = distance + "px";
-        menuPos = window.getComputedStyle(menuItems).right.slice(0,-2);
-        menuItemsxPos = menuItems.getBoundingClientRect().left;
-        logFollowUp();
-        // console.log(`Moved ${distance} to the ${arrowDir} and is positioned ${menuItems.style.right}`);
-    } else if (arrowDir === "right" && calcRigthLimit(menuItemsxPos, navWidth, arrowsContainerPadding) < 1200) {
-      // console.log(`Pressed the right arrow and distance = ${distance}`);
-      console.log(calcRigthLimit(menuItemsxPos, navWidth, arrowsContainerPadding));
-        distance = distance + step;
-        menuItems.style.right = distance + "px";
-        menuPos = window.getComputedStyle(menuItems).right.slice(0,-2);
-        menuItemsxPos = menuItems.getBoundingClientRect().left;
-        logFollowUp();
-        // console.log(`Moved ${distance} to the ${arrowDir} and is positioned ${menuItems.style.right}`);
+    // Condition:  && menuItemsxPos <= 30  
+    if (arrowDir === "left" && firstMenuItemXPos < 40) {
+        
+        let dir = distance = distance - step;
+        move (dir);
+        checkSizesPos()
+
+      // Condition:   && calcRigthLimit(liGroupxPos, navWidth, arrowsContainerPadding) < 1200  
+    } else if (arrowDir === "right" && lastMenuItemXPos > menuContainerWidth - 100) {
+        
+        let dir = distance = distance + step;
+        move (dir);
+        checkSizesPos()
+
     }   
 
   }
+}
+
+function move (direction) {
+  menuContainer.style.right = direction + "px";
+  // liGroupRight = window.getComputedStyle(menuContainer).right.slice(0,-2);
+  // liGroupxPos = menuContainer.getBoundingClientRect().left;
+  logFollowUp();
 }

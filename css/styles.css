@@ -24,6 +24,8 @@ header {
   nav {
     overflow: hidden;
     position: relative;
+    border: 1px solid yellow;
+    
   }
   
   ul {
@@ -63,7 +65,7 @@ header {
     position: absolute;
     display: flex;
     align-items: center;
-    display: none;
+    /* display: none; */
   }
   
   .nav-arrow:first-child {
